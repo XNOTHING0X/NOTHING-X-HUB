@@ -221,7 +221,7 @@ local function createBillboard(name, parent, adornee, displayText)
     nameLabel.Text = displayText
     nameLabel.Size = UDim2.new(1, 0, 1, 0)
     nameLabel.TextScaled = false
-    nameLabel.TextSize = 13
+    nameLabel.TextSize = 14
     nameLabel.BackgroundTransparency = 1
     nameLabel.TextColor3 = Color3.new(1, 1, 1)
     nameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
@@ -412,7 +412,7 @@ end)
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local function getPlayerNames()
-    local names = {"None"} 
+    local names = {"None"}
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
             table.insert(names, player.Name)
@@ -426,13 +426,23 @@ local Dropdown = Tabs.X:AddDropdown("Dropdown_player", {
     Multi = false,
     Default = "None"
 })
+local function updateDropdown()
+    Dropdown:SetValues(getPlayerNames())
+    Dropdown:SetValue("None") 
+end
+Players.PlayerAdded:Connect(function()
+    updateDropdown()
+end)
+Players.PlayerRemoving:Connect(function()
+    updateDropdown()
+end)
 local Button = Tabs.X:AddButton({
     Title = "Teleport to Player",
     Callback = function()
-        local selectedPlayerName = Dropdown:GetValue()
+        local selectedPlayerName = Dropdown.Value 
         if selectedPlayerName and selectedPlayerName ~= "None" then
             local targetPlayer = Players:FindFirstChild(selectedPlayerName)
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
             else
             end
